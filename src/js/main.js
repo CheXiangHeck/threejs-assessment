@@ -76,7 +76,7 @@ animate();
 async function init() {
   const tableData = sheetDataFormatter(
     await loadSheetData(
-      `https://sheets.googleapis.com/v4/spreadsheets/111_ENaxCo8Y3v3fAMWQuocQIrK53pE1lADEkqnrDBOU/values/${encodeURIComponent("Data Template")}?key=${import.meta.env.VITE_GS_API_KEY}`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/google-sheet/get-sheet-data.php`,
     ),
   );
 
