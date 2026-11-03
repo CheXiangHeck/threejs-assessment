@@ -39,6 +39,8 @@ export default defineConfig({
       input: {
         main: resolve(srcRoot, "index.html"),
         signIn: resolve(srcRoot, "sign-in/index.html"),
+        privay: resolve(srcRoot, "privacy/index.html"),
+        terms: resolve(srcRoot, "terms/index.html"),
       },
     },
   },
