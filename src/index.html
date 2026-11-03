@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+  <head>
+    <title>three.js css3d - periodic table</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <meta property="og:title" content="three.js css3d - periodic table" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://threejs.org/examples/css3d_periodictable.html"
+    />
+    <meta
+      property="og:image"
+      content="https://threejs.org/examples/screenshots/css3d_periodictable.jpg"
+    />
+    <link type="text/css" rel="stylesheet" href="main.css" />
+    <style>
+      a {
+        color: #8ff;
+      }
+
+      #menu {
+        position: absolute;
+        bottom: 20px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .element {
+        width: 120px;
+        height: 160px;
+        background-color: var(--card-rgb);
+        border: 5px solid var(--card-border-rgb); /* reserves space so hover doesn't shift the layout */
+        box-shadow: 0 0 12px var(--card-border-rgb);
+        border-radius: 10px;
+        font-family: Helvetica, sans-serif;
+        text-align: center;
+        line-height: normal;
+        cursor: default;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        color: white;
+      }
+
+      .element:hover {
+        background-color: var(--card-rgb);
+        border: 7px solid var(--card-border-rgb);
+        box-shadow: 0 0 12px var(--card-border-rgb);
+      }
+
+      .element .numberBox {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        font-size: 12px;
+      }
+
+      .element .image {
+        width: 100%;
+        object-fit: cover; /* crops instead of stretching non-square photos */
+        border-radius: 4px;
+      }
+
+      .element .details {
+        width: 100%;
+      }
+
+      button {
+        background: rgba(0, 255, 255, 0.35);
+        border: 0px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: rgba(0, 255, 255, 0.5);
+      }
+
+      button:active {
+        color: #000000;
+        background-color: rgba(0, 255, 255, 0.75);
+      }
+      #account-panel {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        z-index: 10;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 10px 14px;
+        background: rgba(0, 30, 40, 0.85);
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        border-radius: 8px;
+
+        color: white;
+        font-family: Helvetica, sans-serif;
+        font-size: 13px;
+      }
+
+      #logout {
+        background: rgba(255, 70, 70, 0.3);
+        color: white;
+        border: 1px solid rgba(255, 70, 70, 0.6);
+        border-radius: 4px;
+        padding: 6px 12px;
+      }
+
+      #logout:hover {
+        background: rgba(255, 70, 70, 0.6);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header-->
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+      css3d - periodic table.
+    </div>
+    <!-- User Account -->
+    <div id="account-panel">
+      <span id="user-email">Loading account...</span>
+      <button id="logout">LOGOUT</button>
+    </div>
+    <!-- Data Displayer -->
+    <div id="container"></div>
+    <!-- Footer Display Type Selector -->
+    <div id="menu">
+      <button id="table">TABLE</button>
+      <button id="sphere">SPHERE</button>
+      <button id="helix">HELIX</button>
+      <button id="grid">GRID</button>
+    </div>
+
+    <!-- Import Map for Module Resolution -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../build/three.module.js",
+          "three/addons/": "../jsm/"
+        }
+      }
+    </script>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

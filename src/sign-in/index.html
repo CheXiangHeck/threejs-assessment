@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in</title>
+    <link rel="stylesheet" href="../../main.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #080808;
+        color: #fff;
+        font-family: Arial, sans-serif;
+      }
+
+      .auth-page {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 24px;
+      }
+
+      .auth-card {
+        width: 100%;
+        max-width: 360px;
+        background: #141414;
+        border: 1px solid #292929;
+        border-radius: 12px;
+        padding: 38px 30px;
+        text-align: center;
+        box-shadow: 0 0 35px rgba(40, 100, 255, 0.07);
+      }
+
+      h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0 0 10px;
+      }
+
+      .subtitle {
+        color: #929292;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 0 0 22px;
+      }
+
+      #status {
+        color: #aaa;
+        font-size: 12px;
+        margin: 0 0 18px;
+      }
+
+      #login {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 220px;
+        height: 40px;
+        background: #3979ed;
+        color: white;
+        border: 1px solid #548bfa;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          box-shadow 0.2s;
+      }
+
+      #login:hover {
+        background: #2867d9;
+        box-shadow: 0 4px 16px rgba(57, 121, 237, 0.25);
+      }
+
+      #logout {
+        width: 220px;
+        height: 40px;
+        background: #242424;
+        color: white;
+        border: 1px solid #383838;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      #logout:hover {
+        background: #333;
+      }
+
+      .google-logo {
+        width: 19px;
+        height: 19px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        background: white;
+        color: #4285f4;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 13px;
+      }
+
+      .card-footer {
+        margin: 25px -30px -38px;
+        padding: 14px;
+        border-top: 1px solid #292929;
+        color: #686868;
+        font-size: 10px;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="auth-page">
+      <section class="auth-card">
+        <div class="auth-content">
+          <div class="brand-icon">
+            <span>G</span>
+          </div>
+
+          <h1>Welcome Back</h1>
+
+          <p class="subtitle">Sign in with your Google account to continue.</p>
+
+          <p id="status" class="status">Please sign in to continue.</p>
+
+          <button id="login" class="google-button" hidden>
+            <span class="google-logo">G</span>
+            <span>Sign in with Google</span>
+          </button>
+
+          <button id="logout" class="logout-button" hidden>Log out</button>
+        </div>
+
+        <div class="card-footer">Secure authentication powered by Google</div>
+      </section>
+    </main>
+
+    <script type="module">
+      const API = `${import.meta.env.VITE_BACKEND_URL}/api/google-sign-in`;
+      const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+      const statusEl = document.getElementById("status");
+      const loginBtn = document.getElementById("login");
+      const logoutBtn = document.getElementById("logout");
+
+      let codeClient;
+
+      function showLoggedOut(message = "Please sign in.") {
+        statusEl.textContent = message;
+        loginBtn.hidden = false;
+        logoutBtn.hidden = true;
+      }
+
+      function showLoggedIn(user) {
+        statusEl.textContent = `Welcome, ${user.email}`;
+
+        loginBtn.hidden = true;
+        logoutBtn.hidden = true;
+
+        setTimeout(() => {
+          window.location.replace("../../index.html");
+        }, 1200);
+      }
+
+      async function checkLogin() {
+        try {
+          const response = await fetch(`${API}/authorized.php`, {
+            credentials: "include",
+          });
+
+          if (!response.ok) {
+            showLoggedOut();
+            return;
+          }
+
+          const user = await response.json();
+          showLoggedIn(user);
+        } catch (error) {
+          console.error(error);
+          showLoggedOut("Could not reach the server.");
+        }
+      }
+
+      // Google returns an authorization code here.
+      async function handleCodeResponse(response) {
+        if (response.error) {
+          console.error(response);
+          showLoggedOut("Google authorization failed.");
+          return;
+        }
+
+        statusEl.textContent = "Signing in...";
+
+        try {
+          const res = await fetch(`${API}/auth.php`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              code: response.code,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            showLoggedOut(data.error || "Sign-in failed.");
+            return;
+          }
+
+          await checkLogin();
+        } catch (error) {
+          console.error(error);
+          showLoggedOut("Sign-in failed.");
+        }
+      }
+
+      async function logout() {
+        try {
+          await fetch(`${API}/logout.php`, {
+            method: "POST",
+            credentials: "include",
+          });
+
+          showLoggedOut("You have logged out.");
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = "Logout failed.";
+        }
+      }
+
+      window.addEventListener("load", async () => {
+        // Configure Google OAuth authorization code flow.
+        codeClient = google.accounts.oauth2.initCodeClient({
+          client_id: CLIENT_ID,
+          scope: "https://www.googleapis.com/auth/userinfo.email",
+          ux_mode: "popup",
+          callback: handleCodeResponse,
+        });
+
+        // Start the authorization flow only after a user click.
+        loginBtn.onclick = () => {
+          statusEl.textContent = "Waiting for Google...";
+          codeClient.requestCode();
+        };
+
+        logoutBtn.onclick = logout;
+
+        await checkLogin();
+      });
+    </script>
+  </body>
+</html>
